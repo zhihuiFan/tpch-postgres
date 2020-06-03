@@ -1,7 +1,6 @@
-This repo can be used to test some optimizer feature correctness and performance
-gain with TPC-H workload.  It is an intermediate results of [1], so that you
-don't need to install pgdexter, hgpopg extension and so on.
-
+Since data.gz exceeds the largest size github allows, I have to use
+git lfs to store it.  so you have to install [git-lfs](https://git-lfs.github.com/) 
+before clone it. 
 
 How can it be used?
 -- 
