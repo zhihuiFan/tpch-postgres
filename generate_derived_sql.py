@@ -26,6 +26,14 @@ with open('explain.analyze.sql', 'w') as g1:
         sql = "explain analyze %s;\n\n" % (q)
         g1.write(sql)
 
+with open('explain.costoff.sql', 'w') as g1:
+    for idx, q in enumerate(queries):
+        if idx in [14, 16]:
+            g1.write("%s;\n\n" % q)
+            continue
+        sql = "explain (costs off) %s;\n\n" % (q)
+        g1.write(sql)
+
 
 with open('capture.result.sql', 'w') as g1:
     for idx, q in enumerate(queries):
