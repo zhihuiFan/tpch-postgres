@@ -61,6 +61,7 @@ function main {
     # get which plan changed.
     cd logs
     sql_files=`git status | grep modified | awk '{print $2}' | sed -e 's/explain.log/run.sql/'`
+    cd ..
     echo $sql_files
     for sql_file in ${sql_files}; do
 	echo "Running ${sql_file}.."
@@ -68,10 +69,16 @@ function main {
 	run_query_with_zero_cache $adjusted_random_page_cost $sql_file 2
     done
 
+    cd logs/
     git commit -m "plan and execution stats for random_page_cost=$base_random_page_cost"
-    git commit -am "plan and execution stats for random_page_cost=$adjusted_random_page_cost"
+    git add *.explain.log
+    git commit -m "commit the plan changes for random_page_cost=$adjusted_random_page_cost"
+    git commit -am "commit the execution stat changes for random_page_cost=$adjusted_random_page_cost"
+    cd ..
 }
 
 rm -rf logs
 git init logs
+starttime=`date`
 main 4.0 8.6
+echo $starttime `date`
