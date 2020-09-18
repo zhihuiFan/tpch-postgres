@@ -15,7 +15,6 @@ for idx, query in enumerate(d_queries):
         continue
     queries.append(query)
 
-
 assert len(queries) == 24, len(queries)
 
 with open('explain.analyze.sql', 'w') as g1:
@@ -23,7 +22,7 @@ with open('explain.analyze.sql', 'w') as g1:
         if idx in [14, 16]:
             g1.write("%s;\n\n" % q)
             continue
-        sql = "explain analyze %s;\n\n" % (q)
+        sql = "explain (analyze, verbose, buffers) %s;\n\n" % (q)
         g1.write(sql)
 
 with open('explain.costoff.sql', 'w') as g1:
@@ -55,3 +54,12 @@ with open('diff.sql', 'w') as g1:
 ((%s) except all select * from query_%d);\n\n
  ''' % (idx, q, q, idx)
         g1.write(sql)
+
+
+del queries[16]
+del queries[14]
+
+for idx, q in enumerate(queries):
+    with open("q%d.explain.sql" % idx, 'w') as explain, open("q%d.run.sql" % idx, 'w') as run:
+        explain.write("explain (costs off) \n%s;\n" % q)
+        run.write("explain (analyze, verbose, buffers) \n%s;\n" % q)

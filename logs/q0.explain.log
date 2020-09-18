@@ -1,0 +1,19 @@
+ pg_backend_pid 
+----------------
+          67978
+(1 row)
+
+                                              QUERY PLAN                                              
+------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate
+   Group Key: l_returnflag, l_linestatus
+   ->  Gather Merge
+         Workers Planned: 2
+         ->  Sort
+               Sort Key: l_returnflag, l_linestatus
+               ->  Partial HashAggregate
+                     Group Key: l_returnflag, l_linestatus
+                     ->  Parallel Seq Scan on lineitem
+                           Filter: (l_shipdate <= '1998-09-06 00:00:00'::timestamp without time zone)
+(10 rows)
+

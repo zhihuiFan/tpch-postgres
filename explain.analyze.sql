@@ -1,4 +1,4 @@
-explain analyze select
+explain (analyze, verbose, buffers) select
 	l_returnflag,
 	l_linestatus,
 	sum(l_quantity) as sum_qty,
@@ -20,7 +20,7 @@ order by
 	l_returnflag,
 	l_linestatus;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	s_acctbal,
 	s_name,
 	n_name,
@@ -65,7 +65,7 @@ order by
 	p_partkey
 limit 100;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	l_orderkey,
 	sum(l_extendedprice * (1 - l_discount)) as revenue,
 	o_orderdate,
@@ -89,7 +89,7 @@ order by
 	o_orderdate
 limit 10;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	o_orderpriority,
 	count(*) as order_count
 from
@@ -111,7 +111,7 @@ group by
 order by
 	o_orderpriority;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	n_name,
 	sum(l_extendedprice * (1 - l_discount)) as revenue
 from
@@ -136,7 +136,7 @@ group by
 order by
 	revenue desc;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	sum(l_extendedprice * l_discount) as revenue
 from
 	lineitem
@@ -146,7 +146,7 @@ where
 	and l_discount between 0.02 - 0.01 and 0.02 + 0.01
 	and l_quantity < 24;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	supp_nation,
 	cust_nation,
 	l_year,
@@ -186,7 +186,7 @@ order by
 	cust_nation,
 	l_year;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	o_year,
 	sum(case
 		when nation = 'JAPAN' then volume
@@ -224,7 +224,7 @@ group by
 order by
 	o_year;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	nation,
 	o_year,
 	sum(amount) as sum_profit
@@ -257,7 +257,7 @@ order by
 	nation,
 	o_year desc;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	c_custkey,
 	c_name,
 	sum(l_extendedprice * (1 - l_discount)) as revenue,
@@ -290,7 +290,7 @@ order by
 	revenue desc
 limit 20;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	ps_partkey,
 	sum(ps_supplycost * ps_availqty) as value
 from
@@ -318,7 +318,7 @@ group by
 order by
 	value desc;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	l_shipmode,
 	sum(case
 		when o_orderpriority = '1-URGENT'
@@ -347,7 +347,7 @@ group by
 order by
 	l_shipmode;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	c_count,
 	count(*) as custdist
 from
@@ -368,7 +368,7 @@ order by
 	custdist desc,
 	c_count desc;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	100.00 * sum(case
 		when p_type like 'PROMO%'
 			then l_extendedprice * (1 - l_discount)
@@ -394,7 +394,7 @@ create view revenue0 (supplier_no, total_revenue) as
 	group by
 		l_suppkey;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	s_suppkey,
 	s_name,
 	s_address,
@@ -416,7 +416,7 @@ order by
 
 drop view revenue0;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	p_brand,
 	p_type,
 	p_size,
@@ -447,7 +447,7 @@ order by
 	p_type,
 	p_size;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	sum(l_extendedprice) / 7.0 as avg_yearly
 from
 	lineitem,
@@ -465,7 +465,7 @@ where
 			l_partkey = p_partkey
 	);
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	c_name,
 	c_custkey,
 	o_orderkey,
@@ -499,7 +499,7 @@ order by
 	o_orderdate
 limit 100;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	sum(l_extendedprice* (1 - l_discount)) as revenue
 from
 	lineitem,
@@ -535,7 +535,7 @@ where
 		and l_shipinstruct = 'DELIVER IN PERSON'
 	);
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	s_name,
 	s_address
 from
@@ -573,7 +573,7 @@ where
 order by
 	s_name;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	s_name,
 	count(*) as numwait
 from
@@ -614,7 +614,7 @@ order by
 	s_name
 limit 100;
 
-explain analyze select
+explain (analyze, verbose, buffers) select
 	cntrycode,
 	count(*) as numcust,
 	sum(c_acctbal) as totacctbal
