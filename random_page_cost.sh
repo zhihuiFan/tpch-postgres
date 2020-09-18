@@ -5,16 +5,13 @@
 
 source ./env.sh
 
-function run_query_with_no_cache {
+function explain_query {
     random_page_cost=$1
     query_id=$2
 
     # for seq = 1, we add the logfile, for others, we just echo the content
     # so that we can get the difference.
     seq=$3
-
-    # not really run, just get the plan.
-    real_run=$4
 
     # clear file system cache and shared_buffer cache.
     $PG_CTL stop -D $PG_DIR
@@ -29,31 +26,52 @@ function run_query_with_no_cache {
 	git add q${query_id}.explain.log
 	cd ..
     fi
-
-    if [ "real_run" == "1" ]; then
-	$PG_SQL tpch10g -f q${query_id}.run.sql > logs/q${query_id}.run.log
-
-	if [ "$seq" == "1" ]; then
-	    cd logs
-	    git add q${query_id}.run.log
-	    cd ..
-	fi
-    fi
 }
 
+
+function run_query_with_zero_cache {
+    random_page_cost=$1
+    query_file=$2
+    seq=${3}
+
+    # clear file system cache and shared_buffer cache.
+    $PG_CTL stop -D $PG_DIR
+    sudo sh -c "sync; echo 3 > /proc/sys/vm/drop_caches; free -g"
+    $PG_CTL start -D $PG_DIR -o --random_page_cost=${random_page_cost}
+
+    $PG_SQL ${DB_NAME} -f ${query_file} > logs/${query_file}.log
+    
+    if [ "$seq" == "1" ]; then
+	cd logs
+	git add ${query_file}.log
+	cd ..
+    fi
+}
 
 function main {
     base_random_page_cost=$1
     adjusted_random_page_cost=$2
-    real_run=$3
 
-    for query_id in `seq 0 1`; do
-	run_query_with_no_cache $base_random_page_cost $query_id 1 $real_run
-	run_query_with_no_cache $adjusted_random_page_cost $query_id 2 $real_run
+    # the the explain only
+    for query_id in `seq 0 21`; do
+	explain_query $base_random_page_cost $query_id 1
+	explain_query $adjusted_random_page_cost $query_id 2
     done
-}
 
+    # get which plan changed.
+    cd logs
+    sql_files=`git status | grep modified | awk '{print $2}' | sed -e 's/explain.log/run.sql/'`
+    echo $sql_files
+    for sql_file in ${sql_files}; do
+	echo "Running ${sql_file}.."
+	run_query_with_zero_cache $base_random_page_cost $sql_file 1
+	run_query_with_zero_cache $adjusted_random_page_cost $sql_file 2
+    done
+
+    git commit -m "plan and execution stats for random_page_cost=$base_random_page_cost"
+    git commit -am "plan and execution stats for random_page_cost=$adjusted_random_page_cost"
+}
 
 rm -rf logs
 git init logs
-main 4.0 8.2
+main 4.0 8.6

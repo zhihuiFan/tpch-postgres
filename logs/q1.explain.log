@@ -1,8 +1,3 @@
- pg_backend_pid 
-----------------
-          68764
-(1 row)
-
                                                   QUERY PLAN                                                  
 --------------------------------------------------------------------------------------------------------------
  Limit
@@ -10,25 +5,23 @@
          Sort Key: supplier.s_acctbal DESC, nation.n_name, supplier.s_name, part.p_partkey
          ->  Hash Join
                Hash Cond: ((part.p_partkey = partsupp.ps_partkey) AND ((SubPlan 1) = partsupp.ps_supplycost))
-               ->  Bitmap Heap Scan on part
-                     Recheck Cond: (p_size = 20)
-                     Filter: ((p_type)::text ~~ '%TIN'::text)
-                     ->  Bitmap Index Scan on idx_part_p_size
-                           Index Cond: (p_size = 20)
+               ->  Seq Scan on part
+                     Filter: (((p_type)::text ~~ '%TIN'::text) AND (p_size = 20))
                ->  Hash
-                     ->  Nested Loop
-                           ->  Hash Join
-                                 Hash Cond: (supplier.s_nationkey = nation.n_nationkey)
-                                 ->  Seq Scan on supplier
-                                 ->  Hash
-                                       ->  Hash Join
-                                             Hash Cond: (nation.n_regionkey = region.r_regionkey)
-                                             ->  Seq Scan on nation
-                                             ->  Hash
-                                                   ->  Seq Scan on region
-                                                         Filter: (r_name = 'AFRICA'::bpchar)
-                           ->  Index Scan using partsupp_ps_suppkey_idx on partsupp
-                                 Index Cond: (ps_suppkey = supplier.s_suppkey)
+                     ->  Hash Join
+                           Hash Cond: (partsupp.ps_suppkey = supplier.s_suppkey)
+                           ->  Seq Scan on partsupp
+                           ->  Hash
+                                 ->  Hash Join
+                                       Hash Cond: (supplier.s_nationkey = nation.n_nationkey)
+                                       ->  Seq Scan on supplier
+                                       ->  Hash
+                                             ->  Hash Join
+                                                   Hash Cond: (nation.n_regionkey = region.r_regionkey)
+                                                   ->  Seq Scan on nation
+                                                   ->  Hash
+                                                         ->  Seq Scan on region
+                                                               Filter: (r_name = 'AFRICA'::bpchar)
                SubPlan 1
                  ->  Aggregate
                        ->  Nested Loop
@@ -45,5 +38,5 @@
                                                Index Cond: (ps_partkey = part.p_partkey)
                                          ->  Index Scan using idx_supplier_s_suppkey on supplier supplier_1
                                                Index Cond: (s_suppkey = partsupp_1.ps_suppkey)
-(40 rows)
+(38 rows)
 
