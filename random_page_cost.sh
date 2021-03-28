@@ -80,5 +80,5 @@ function main {
 rm -rf logs
 git init logs
 starttime=`date`
-main 4.0 8.6
+main 8.6 12.3
 echo $starttime `date`
